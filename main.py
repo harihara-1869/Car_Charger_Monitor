@@ -351,8 +351,12 @@ class ChargerMonitor:
 
         watts = phase_data.get(self.phase)
         if watts is None:
-            log.warning("[%s] No data for phase %s", now, self.phase.upper())
-            return
+            total = phase_data.get("total")
+            if total is None:
+                log.warning("[%s] No data for phase %s and no site total — skipping", now, self.phase.upper())
+                return
+            log.warning("[%s] No per-phase data — falling back to site total: %dW", now, total)
+            watts = total
 
         all_phases = "  |  ".join(
             f"{k.upper()}: {v}W" for k, v in phase_data.items() if v is not None
